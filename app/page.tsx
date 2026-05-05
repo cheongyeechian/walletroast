@@ -175,22 +175,76 @@ function ChainPill({
 
 function Dashboard({ data, onReset }: { data: ApiResponse; onReset: () => void }) {
   const { stats, roast, chain } = data;
+  const [sharing, setSharing] = useState(false);
   const shortAddr = `${stats.address.slice(0, 6)}…${stats.address.slice(-4)}`;
 
-  function tweet() {
-    if (typeof window === 'undefined') return;
-    const params = new URLSearchParams({
-      addr: stats.address,
-      v: roast.verdict,
-      s: roast.highlight_stat,
-      d: String(stats.walletAgeDays),
-      t: String(stats.txCount),
-      p: formatCompact(stats.totalValueUsd),
-    });
-    const shareUrl = `${window.location.origin}/share?${params.toString()}`;
-    const text = `I just got roasted by my wallet 😅\n\n"${roast.verdict}"\n\n${roast.highlight_stat}`;
-    const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
-    window.open(intent, '_blank', 'noopener,noreferrer');
+  async function tweet() {
+    if (typeof window === 'undefined' || sharing) return;
+    setSharing(true);
+    try {
+      const ogParams = new URLSearchParams({
+        s: roast.highlight_stat,
+        d: String(stats.walletAgeDays),
+        t: String(stats.txCount),
+        p: formatCompact(stats.totalValueUsd),
+      });
+      const imgRes = await fetch(`/api/og?${ogParams.toString()}`);
+      if (!imgRes.ok) throw new Error('Image generation failed');
+      const blob = await imgRes.blob();
+      const file = new File([blob], 'wallet-roast.png', { type: 'image/png' });
+      const text = `I just got roasted by my wallet 😅\n\n"${roast.verdict}"`;
+
+      // 1) Mobile / OS-native share sheet with file attachment
+      if (
+        typeof navigator !== 'undefined' &&
+        typeof navigator.canShare === 'function' &&
+        navigator.canShare({ files: [file] })
+      ) {
+        try {
+          await navigator.share({ files: [file], text });
+          return;
+        } catch (e) {
+          if ((e as Error).name === 'AbortError') return;
+        }
+      }
+
+      // 2) Desktop: copy image to clipboard (Chrome / Safari recent)
+      let copied = false;
+      try {
+        if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+          copied = true;
+        }
+      } catch {
+        /* fall through to download */
+      }
+
+      // 3) Final fallback: download the image to disk
+      if (!copied) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'wallet-roast.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+      window.open(intent, '_blank', 'noopener,noreferrer');
+
+      alert(
+        copied
+          ? 'Image copied to clipboard. Paste it into your X tweet (Cmd/Ctrl + V).'
+          : 'Image downloaded. Attach it to your X tweet.'
+      );
+    } catch (err) {
+      console.error(err);
+      alert('Failed to generate share image. Please try again.');
+    } finally {
+      setSharing(false);
+    }
   }
 
   return (
@@ -362,9 +416,10 @@ function Dashboard({ data, onReset }: { data: ApiResponse; onReset: () => void }
       <section className="flex flex-col sm:flex-row gap-3 pt-2">
         <button
           onClick={tweet}
-          className="flex-1 bg-white text-black font-bold py-3 rounded-xl hover:bg-zinc-200 transition"
+          disabled={sharing}
+          className="flex-1 bg-white text-black font-bold py-3 rounded-xl hover:bg-zinc-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Share on X / Twitter
+          {sharing ? 'Generating image…' : 'Share on X / Twitter'}
         </button>
         <button
           onClick={onReset}
