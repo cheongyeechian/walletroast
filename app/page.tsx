@@ -255,12 +255,14 @@ function Dashboard({ data, onReset }: { data: ApiResponse; onReset: () => void }
             ) : (
               <ul className="divide-y divide-zinc-800">
                 {stats.topHoldings.map((h, i) => (
-                  <li key={i} className="py-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-mono font-semibold truncate">{h.symbol}</span>
-                      <span className="text-xs text-zinc-500 truncate">{h.chain}</span>
+                  <li key={i} className="py-2.5 flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-mono font-semibold text-sm truncate">{h.symbol}</div>
+                      <div className="text-[11px] text-zinc-500 truncate mt-0.5">{h.chain}</div>
                     </div>
-                    <span className="font-mono text-sm shrink-0 ml-2">${formatCompact(h.value)}</span>
+                    <span className="font-mono text-sm shrink-0 tabular-nums whitespace-nowrap">
+                      ${formatCompact(h.value)}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -273,9 +275,9 @@ function Dashboard({ data, onReset }: { data: ApiResponse; onReset: () => void }
             ) : (
               <ul className="divide-y divide-zinc-800">
                 {stats.favoriteApps.map((a, i) => (
-                  <li key={i} className="py-2 flex items-center justify-between">
-                    <span className="truncate">{a.name}</span>
-                    <span className="font-mono text-sm text-zinc-400 shrink-0 ml-2">
+                  <li key={i} className="py-2.5 flex items-center justify-between gap-3">
+                    <span className="truncate text-sm min-w-0 flex-1">{a.name}</span>
+                    <span className="font-mono text-sm text-zinc-400 shrink-0 tabular-nums whitespace-nowrap">
                       {a.count} {a.count === 1 ? 'tx' : 'txs'}
                     </span>
                   </li>
@@ -322,13 +324,13 @@ function Dashboard({ data, onReset }: { data: ApiResponse; onReset: () => void }
                   const total = t.realized + t.unrealized;
                   const positive = total >= 0;
                   return (
-                    <li key={i} className="py-2 flex items-center justify-between">
-                      <span className="font-mono font-semibold">{t.symbol}</span>
-                      <div className="text-right">
-                        <div className={`font-mono text-sm ${positive ? 'text-emerald-400' : 'text-red-400'}`}>
+                    <li key={i} className="py-2.5 flex items-center justify-between gap-3">
+                      <span className="font-mono font-semibold text-sm truncate min-w-0 flex-1">{t.symbol}</span>
+                      <div className="text-right shrink-0">
+                        <div className={`font-mono text-sm tabular-nums ${positive ? 'text-emerald-400' : 'text-red-400'}`}>
                           {positive ? '+' : '-'}${formatCompact(Math.abs(total))}
                         </div>
-                        <div className="text-xs text-zinc-500">{t.gainPct.toFixed(1)}%</div>
+                        <div className="text-[11px] text-zinc-500 tabular-nums">{t.gainPct.toFixed(1)}%</div>
                       </div>
                     </li>
                   );
