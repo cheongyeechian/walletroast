@@ -143,9 +143,6 @@ function InputCard(props: {
             {error}
           </p>
         )}
-        <p className="mt-4 text-xs text-zinc-500 text-center">
-          3 roasts per day. Read-only. No wallet connection needed.
-        </p>
       </div>
     </form>
   );
@@ -179,16 +176,8 @@ function Dashboard({ data, onReset }: { data: ApiResponse; onReset: () => void }
 
   function tweet() {
     if (typeof window === 'undefined') return;
-    const params = new URLSearchParams({
-      addr: stats.address,
-      v: roast.verdict,
-      s: roast.highlight_stat,
-      d: String(stats.walletAgeDays),
-      t: String(stats.txCount),
-      p: formatCompact(stats.totalValueUsd),
-    });
-    const shareUrl = `${window.location.origin}/share?${params.toString()}`;
-    const text = `I just got roasted by my wallet 😅\n\n"${roast.verdict}"`;
+    const shareUrl = window.location.origin;
+    const text = `I just got roasted by my wallet\n\n"${roast.verdict}"`;
     const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(intent, '_blank', 'noopener,noreferrer');
   }
