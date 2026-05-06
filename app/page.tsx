@@ -52,7 +52,7 @@ export default function Page() {
 
   return (
     <main className="flex-1 w-full">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <div className="max-w-5xl mx-auto px-3 sm:px-6 py-6 sm:py-12">
         <Header />
         {!result ? (
           <InputCard
@@ -75,13 +75,13 @@ export default function Page() {
 
 function Header() {
   return (
-    <div className="text-center mb-10 sm:mb-14">
-      <h1 className="text-4xl sm:text-6xl font-black tracking-tight">
+    <div className="text-center mb-8 sm:mb-14">
+      <h1 className="text-5xl sm:text-6xl font-black tracking-tight leading-none">
         <span className="bg-gradient-to-r from-orange-400 via-red-400 to-pink-500 bg-clip-text text-transparent">
           Wallet Roast
         </span>
       </h1>
-      <p className="mt-3 text-base sm:text-lg text-zinc-400">
+      <p className="mt-3 text-base sm:text-lg text-zinc-400 px-2">
         Paste a wallet. Get roasted by your own on-chain history.
       </p>
     </div>
@@ -105,7 +105,7 @@ function InputCard(props: {
 
   return (
     <form onSubmit={onSubmit} className="max-w-2xl mx-auto">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 sm:p-6 backdrop-blur">
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4 sm:p-6 backdrop-blur">
         <div className="flex gap-2 mb-4 p-1 bg-zinc-950 rounded-xl border border-zinc-800 w-fit">
           <ChainPill active={chain === 'evm'} onClick={() => setChain('evm')}>
             EVM
@@ -183,17 +183,27 @@ function Dashboard({ data, onReset }: { data: ApiResponse; onReset: () => void }
   }
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-2xl border border-zinc-800 bg-gradient-to-br from-orange-500/10 via-red-500/5 to-zinc-900/40 p-6 sm:p-8">
+    <div className="space-y-4 sm:space-y-6">
+      <section className="rounded-2xl border border-zinc-800 bg-gradient-to-br from-orange-500/10 via-red-500/5 to-zinc-900/40 p-5 sm:p-8">
         <div className="flex items-center gap-2 text-xs text-zinc-500 mb-2 font-mono">
           <ChainBadge chain={chain} />
-          <span>{shortAddr}</span>
+          <span className="truncate">{shortAddr}</span>
         </div>
-        <p className="text-2xl sm:text-4xl font-black leading-tight">
+        <p className="text-3xl sm:text-4xl font-black leading-tight">
           &ldquo;{roast.verdict}&rdquo;
         </p>
         <p className="mt-3 text-zinc-400 text-sm sm:text-base">
-          Wallet age <span className="text-white font-semibold">{stats.walletAgeDays}d</span> · {stats.txCount} txs analyzed · ${formatCompact(stats.totalValueUsd)} portfolio
+          <span className="whitespace-nowrap">
+            Wallet age <span className="text-white font-semibold">{stats.walletAgeDays}d</span>
+          </span>
+          <span className="text-zinc-700 mx-2">·</span>
+          <span className="whitespace-nowrap">
+            <span className="text-white font-semibold tabular-nums">{stats.txCount}</span> txs
+          </span>
+          <span className="text-zinc-700 mx-2">·</span>
+          <span className="whitespace-nowrap">
+            <span className="text-white font-semibold tabular-nums">${formatCompact(stats.totalValueUsd)}</span> portfolio
+          </span>
         </p>
       </section>
 
@@ -201,7 +211,7 @@ function Dashboard({ data, onReset }: { data: ApiResponse; onReset: () => void }
         {roast.roasts.map((r, i) => (
           <div
             key={i}
-            className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 text-zinc-100 leading-relaxed"
+            className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 sm:p-5 text-zinc-100 text-[15px] sm:text-base leading-relaxed"
           >
             <div className="text-orange-400 font-mono text-xs mb-2">#{i + 1}</div>
             {r}
@@ -209,11 +219,11 @@ function Dashboard({ data, onReset }: { data: ApiResponse; onReset: () => void }
         ))}
       </section>
 
-      <section className="rounded-2xl border border-orange-500/30 bg-orange-500/5 p-6 sm:p-8 text-center">
-        <div className="text-orange-400 text-xs uppercase tracking-widest mb-2 font-bold">
+      <section className="rounded-2xl border border-orange-500/30 bg-orange-500/5 p-5 sm:p-8 text-center">
+        <div className="text-orange-400 text-[10px] sm:text-xs uppercase tracking-widest mb-2 font-bold">
           Highlight stat
         </div>
-        <p className="text-xl sm:text-2xl font-bold">{roast.highlight_stat}</p>
+        <p className="text-lg sm:text-2xl font-bold leading-snug">{roast.highlight_stat}</p>
       </section>
 
       <section className="space-y-4">
@@ -384,16 +394,16 @@ function Stat({
       <div className="text-[10px] sm:text-xs uppercase tracking-wider text-zinc-500 font-semibold truncate">
         {label}
       </div>
-      <div className="text-lg sm:text-2xl font-bold mt-1 font-mono break-words">{value}</div>
-      {sub && <div className={`text-[10px] sm:text-xs mt-1 ${subColor} truncate`}>{sub}</div>}
+      <div className="text-lg sm:text-2xl font-bold mt-1 font-mono tabular-nums break-words">{value}</div>
+      {sub && <div className={`text-[10px] sm:text-xs mt-1 ${subColor} truncate tabular-nums`}>{sub}</div>}
     </div>
   );
 }
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
-      <h3 className="text-xs uppercase tracking-widest text-zinc-500 font-bold mb-3">{title}</h3>
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 sm:p-5">
+      <h3 className="text-[10px] sm:text-xs uppercase tracking-widest text-zinc-500 font-bold mb-3">{title}</h3>
       {children}
     </div>
   );
