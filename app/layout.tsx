@@ -29,12 +29,14 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     type: "website",
+    images: [{ url: "/logo.png", width: 642, height: 670, alt: "Wallet Roast" }],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: TITLE,
     description: DESCRIPTION,
     creator: "@yeechian_",
+    images: [{ url: "/logo.png", alt: "Wallet Roast" }],
   },
 };
 
